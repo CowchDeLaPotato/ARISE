@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculation - A.R.I.S.E.</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="StSHArise.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">A.R.I.S.E.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html">Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Tax Calculation</h2>
+        <p class="lead text-center">Calculate your taxes based on your income statement.</p>
+        <form id="taxForm">
+            <div class="form-group">
+                <label for="countrySelector">Select Country:</label>
+                <select id="countrySelector" class="form-control">
+                    <option value="Australia">Australia</option>
+                    <option value="England">England</option>
+                    <option value="India">India</option>
+                    <option value="USA">USA</option>
+                    <option value="France">France</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="incomeStatement">Upload Income Statement (PDF):</label>
+                <input type="file" id="incomeStatement" class="form-control-file" accept=".pdf">
+            </div>
+            <div class="form-group">
+                <label for="manualIncome">Enter Income Manually (if needed):</label>
+                <input type="text" id="manualIncome" class="form-control" placeholder="Enter total income">
+                <small class="form-text text-muted">If the automatic extraction fails, enter your total income here.</small>
+            </div>
+            <button type="button" class="btn btn-primary btn-block" onclick="calculateTax()">Calculate Tax</button>
+        </form>
+
+        <div id="taxResult" class="mt-5"></div>
+    </div>
+
+    <script>
+        const taxRates = {
+            "Australia": 0.30,
+            "England": 0.20,
+            "India": 0.25,
+            "USA": 0.22,
+            "France": 0.30
+        };
+
+        const taxInfo = {
+            "Australia": {
+                "filing": "In Australia, you can file taxes through the myTax online service or with the help of a tax agent."
+            },
+            "England": {
+                "filing": "In England, you can file taxes through the HMRC online services or via post."
+            },
+            "India": {
+                "filing": "In India, you can file taxes through the Income Tax Department's online portal."
+            },
+            "USA": {
+                "filing": "In the USA, you can file taxes through the IRS online services or with the help of a tax professional."
+            },
+            "France": {
+                "filing": "In France, you can file taxes through the French Tax Administration's online portal."
+            }
+        };
+
+        async function parsePDF(file) {
+            const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+            let text = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(item => item.str).join(' ');
+            }
+            return text;
+        }
+
+        async function calculateTax() {
+            const country = document.getElementById('countrySelector').value;
+            const fileInput = document.getElementById('incomeStatement');
+            const manualIncomeInput = document.getElementById('manualIncome').value;
+
+            let income = 0;
+
+            if (manualIncomeInput) {
+                income = parseFloat(manualIncomeInput.replace(/,/g, ''));
+            } else if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const text = await parsePDF(file);
+                const incomeMatch = text.match(/Total\s+Income\s+\$?([\d,]+)/i);
+                income = incomeMatch ? parseFloat(incomeMatch[1].replace(/,/g, '')) : 0;
+            } else {
+                alert('Please either upload an income statement PDF or manually enter your income.');
+                return;
+            }
+
+            const taxRate = taxRates[country];
+            const taxToBePaid = income * taxRate;
+
+            document.getElementById('taxResult').innerHTML = `
+                <h3>Tax Calculation Result</h3>
+                <p>Your income: $${income.toFixed(2)}</p>
+                <p>Country: ${country}</p>
+                <p>Tax rate: ${(taxRate * 100).toFixed(2)}%</p>
+                <p>Total tax to be paid: $${taxToBePaid.toFixed(2)}</p>
+                <h4>Why You Should File Taxes</h4>
+                <p>Filing taxes is a legal requirement in most countries. It helps fund public services, infrastructure, and social programs. Additionally, filing taxes allows you to claim refunds, deductions, and credits that may be owed to you.</p>
+                <h4>How to File Taxes in ${country}</h4>
+                <p>${taxInfo[country].filing}</p>
+                <h4>Tax Filing Tips</h4>
+                <ul>
+                    <li>Keep accurate records of your income and expenses.</li>
+                    <li>File your taxes before the deadline to avoid penalties.</li>
+                    <li>Consult a tax professional if you're unsure about tax laws.</li>
+                    <li>Take advantage of tax deductions and credits.</li>
+                </ul>
+            `;
+        }
+    </script>
+</body>
+</html>

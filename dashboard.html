@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - A.R.I.S.E.</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="StSHArise.css" rel="stylesheet" type="text/css">
+    <style>
+        .dashboard-card {
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2), -5px -5px 15px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 10px 10px 25px rgba(0, 0, 0, 0.3), -10px -10px 25px rgba(255, 255, 255, 0.9);
+        }
+
+        .dashboard-card h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .dashboard-card p {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .dashboard-card .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 50px;
+            padding: 10px 20px;
+        }
+
+        .dashboard-card .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">A.R.I.S.E.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html">Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Welcome to your Dashboard</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="dashboard-card text-center">
+                    <h4 class="card-title">Taxes</h4>
+                    <p class="card-text">Manage your taxes.</p>
+                    <a href="taxes.html" class="btn btn-primary">Manage Taxes</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="dashboard-card text-center">
+                    <h4 class="card-title">Reports</h4>
+                    <p class="card-text">Generate financial reports.</p>
+                    <a href="reports.html" class="btn btn-primary">Generate Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <span>© 2024 A.R.I.S.E. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelectorAll('.navbar').forEach(navbar => navbar.classList.toggle('dark-mode'));
+            document.querySelectorAll('.navbar-brand').forEach(brand => brand.classList.toggle('dark-mode'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.toggle('dark-mode'));
+            document.querySelectorAll('.hero-section .container').forEach(container => container.classList.toggle('dark-mode'));
+            document.querySelectorAll('.feature-card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card-title').forEach(title => title.classList.toggle('dark-mode'));
+            document.querySelectorAll('.btn-primary').forEach(btn => btn.classList.toggle('dark-mode'));
+            document.querySelectorAll('.btn-outline-primary').forEach(btn => btn.classList.toggle('dark-mode'));
+            document.querySelectorAll('.footer').forEach(footer => footer.classList.toggle('dark-mode'));
+            document.querySelectorAll('.form-control').forEach(input => input.classList.toggle('dark-mode'));
+        }
+    </script>
+</body>
+</html>

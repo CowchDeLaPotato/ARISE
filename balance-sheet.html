@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Sheet - A.R.I.S.E.</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="StSHArise.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">A.R.I.S.E.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html">Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Balance Sheet</h2>
+        <p class="lead text-center">Create and edit your balance sheet.</p>
+        <!-- Currency Selection -->
+        <div class="text-center mb-4">
+            <label for="currencySelector">Select Currency: </label>
+            <select id="currencySelector" onchange="updateCurrency()">
+                <option value="$">$ - Dollar</option>
+                <option value="₹">₹ - Rupee</option>
+                <option value="A$">A$ - Australian Dollar</option>
+                <option value="€">€ - Euro</option>
+                <option value="£">£ - Pound</option>
+            </select>
+        </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Balance Sheet</h4>
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Item</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="balanceSheetTable">
+                        <!-- Assets -->
+                        <tr class="asset-row">
+                            <td rowspan="2">Assets</td>
+                            <td contenteditable="true">Cash</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$1000</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                        </tr>
+                        <tr class="asset-row">
+                            <td contenteditable="true">Accounts Receivable</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$2000</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><button class="btn btn-success" onclick="addRow('asset')">+ Add Row</button></td>
+                        </tr>
+                        <!-- Liabilities -->
+                        <tr class="liability-row">
+                            <td rowspan="2">Liabilities</td>
+                            <td contenteditable="true">Accounts Payable</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$1500</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                        </tr>
+                        <tr class="liability-row">
+                            <td contenteditable="true">Loans</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$3000</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><button class="btn btn-success" onclick="addRow('liability')">+ Add Row</button></td>
+                        </tr>
+                        <!-- Capital -->
+                        <tr class="capital-row">
+                            <td rowspan="1">Capital</td>
+                            <td contenteditable="true">Owner's Equity</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$5000</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><button class="btn btn-success" onclick="addRow('capital')">+ Add Row</button></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><strong>Total Assets</strong></td>
+                            <td></td>
+                            <td id="totalAssetsAmount">$0.00</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Liabilities</strong></td>
+                            <td></td>
+                            <td id="totalLiabilitiesAmount">$0.00</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Capital</strong></td>
+                            <td></td>
+                            <td id="totalCapitalAmount">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <button class="btn btn-primary" onclick="calculateTotal()">Calculate Total</button>
+                <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let currencySymbol = '$';
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelectorAll('.navbar').forEach(navbar => navbar.classList.toggle('dark-mode'));
+            document.querySelectorAll('.navbar-brand').forEach(brand => brand.classList.toggle('dark-mode'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.footer').forEach(footer => footer.classList.toggle('dark-mode'));
+            document.querySelectorAll('.form-control').forEach(input => input.classList.toggle('dark-mode'));
+        }
+
+        function addRow(section) {
+            var table = document.getElementById("balanceSheetTable");
+            var row = document.createElement("tr");
+            row.className = section + "-row";
+            var cell1 = document.createElement("td");
+            var cell2 = document.createElement("td");
+            var cell3 = document.createElement("td");
+            var cell4 = document.createElement("td");
+            cell1.innerHTML = section.charAt(0).toUpperCase() + section.slice(1);
+            cell2.contentEditable = "true";
+            cell3.contentEditable = "true";
+            cell3.oninput = function() { restrictEdit(this); };
+            cell4.innerHTML = '<button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button>';
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            row.appendChild(cell3);
+            row.appendChild(cell4);
+
+            var lastRow = Array.from(table.getElementsByClassName(section + "-row")).pop();
+            lastRow.after(row);
+        }
+
+        function restrictEdit(element) {
+            let value = element.textContent.replace(/[^0-9.]/g, '');
+            element.textContent = currencySymbol + value;
+        }
+
+        function saveRow(button) {
+            let row = button.parentElement.parentElement;
+            let cells = row.querySelectorAll('td');
+            let amount = parseFloat(cells[2].textContent.replace(currencySymbol, ''));
+            cells[2].textContent = currencySymbol + amount.toFixed(2);
+        }
+
+        function calculateTotal() {
+            let totalAssets = 0, totalLiabilities = 0, totalCapital = 0;
+            document.querySelectorAll('.asset-row').forEach(row => {
+                totalAssets += parseFloat(row.cells[2].textContent.replace(currencySymbol, '')) || 0;
+            });
+            document.querySelectorAll('.liability-row').forEach(row => {
+                totalLiabilities += parseFloat(row.cells[2].textContent.replace(currencySymbol, '')) || 0;
+            });
+            document.querySelectorAll('.capital-row').forEach(row => {
+                totalCapital += parseFloat(row.cells[2].textContent.replace(currencySymbol, '')) || 0;
+            });
+            document.getElementById('totalAssetsAmount').textContent = currencySymbol + totalAssets.toFixed(2);
+            document.getElementById('totalLiabilitiesAmount').textContent = currencySymbol + totalLiabilities.toFixed(2);
+            document.getElementById('totalCapitalAmount').textContent = currencySymbol + totalCapital.toFixed(2);
+        }
+
+        function updateCurrency() {
+            currencySymbol = document.getElementById('currencySelector').value;
+            document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+                cell.textContent = cell.textContent.replace(/^[^\d]+/, currencySymbol);
+            });
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text('Balance Sheet', 14, 16);
+
+            const table = document.getElementById('balanceSheetTable');
+            const rows = Array.from(table.querySelectorAll('tr')).map(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                return cells.slice(0, -1).map(cell => cell.textContent);
+            });
+
+            rows.push([
+                'Total Assets', '', document.getElementById('totalAssetsAmount').textContent
+            ]);
+            rows.push([
+                'Total Liabilities', '', document.getElementById('totalLiabilitiesAmount').textContent
+            ]);
+            rows.push([
+                'Total Capital', '', document.getElementById('totalCapitalAmount').textContent
+            ]);
+
+            doc.autoTable({
+                head: [['Category', 'Item', 'Amount']],
+                body: rows,
+                startY: 20
+            });
+
+            doc.save('Balance_Sheet.pdf');
+        }
+    </script>
+</body>
+</html>

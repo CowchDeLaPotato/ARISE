@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - A.R.I.S.E.</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="StSHArise.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">A.R.I.S.E.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Login</h3>
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" id="username" placeholder="Enter username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" placeholder="Enter password">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <a href="register.html">Don't have an account? Register</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <span>© 2024 A.R.I.S.E. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelectorAll('.navbar').forEach(navbar => navbar.classList.toggle('dark-mode'));
+            document.querySelectorAll('.navbar-brand').forEach(brand => brand.classList.toggle('dark-mode'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.toggle('dark-mode'));
+            document.querySelectorAll('.hero-section .container').forEach(container => container.classList.toggle('dark-mode'));
+            document.querySelectorAll('.feature-card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card-title').forEach(title => title.classList.toggle('dark-mode'));
+            document.querySelectorAll('.btn-primary').forEach(btn => btn.classList.toggle('dark-mode'));
+            document.querySelectorAll('.btn-outline-primary').forEach(btn => btn.classList.toggle('dark-mode'));
+            document.querySelectorAll('.footer').forEach(footer => footer.classList.toggle('dark-mode'));
+            document.querySelectorAll('.form-control').forEach(input => input.classList.toggle('dark-mode'));
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (user && username === user.fullName && password === user.password) {
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Invalid username or password');
+            }
+        });
+    </script>
+</body>
+</html>

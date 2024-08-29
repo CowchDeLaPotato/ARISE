@@ -1,0 +1,379 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit and Loss Statement - A.R.I.S.E.</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="StSHArise.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .editable {
+            background-color: #f9f9f9;
+        }
+
+        .dark-mode {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        .dark-mode .table {
+            border-color: #ffffff !important;
+        }
+
+        .dark-mode .table th,
+        .dark-mode .table td {
+            border-color: #ffffff !important;
+        }
+
+        .auto-style1 {
+            text-decoration: underline;
+        }
+
+        .hidden-pdf {
+            display: none;
+        }
+
+        .hide-column {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-8">
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">A.R.I.S.E.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html">Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mx-auto bg-white shadow-lg rounded-lg p-8">
+        <h1 class="text-2xl font-bold mb-4 text-center">Profit and Loss Statement</h1>
+        <div class="text-center mb-4">
+            <label for="currencySelector">Select Currency: </label>
+            <select id="currencySelector" onchange="updateCurrency()">
+                <option value="$">$ - Dollar</option>
+                <option value="₹">₹ - Rupee</option>
+                <option value="A$">A$ - Australian Dollar</option>
+                <option value="€">€ - Euro</option>
+                <option value="£">£ - Pound</option>
+            </select>
+        </div>
+        <table id="profitLossTable" class="min-w-full divide-y divide-gray-200 table-auto mb-4 table">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">Description</th>
+                    <th class="px-4 py-2">Amount (<span id="currencySymbol">$</span>)</th>
+                    <th class="px-4 py-2 actions-column">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="px-4 py-2 font-bold" colspan="3">Sales</td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Sales</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="sales" oninput="restrictEdit(this)">20000</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Sales Returns</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="salesReturns" oninput="restrictEdit(this)">500</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td class="auto-style1"><strong>Net Sales</strong></td>
+                    <td class="px-4 py-2" id="netSales"></td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="calculateNetSales()">Calculate</button></td>
+                </tr>
+                <tr>
+                    <td class="auto-style1" colspan="3"><strong>Cost of Goods Sold</strong></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Opening Inventory</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="openingInventory" oninput="restrictEdit(this)">3000</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Purchases</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="purchases" oninput="restrictEdit(this)">12000</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Return Outwards</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="returnOutwards" oninput="restrictEdit(this)">800</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Closing Inventory</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="closingInventory" oninput="restrictEdit(this)">4000</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td class="auto-style1"><strong>Cost of Sales</strong></td>
+                    <td class="px-4 py-2" id="costOfSales"></td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="calculateCostOfSales()">Calculate</button></td>
+                </tr>
+                <tr>
+                    <td class="auto-style1"><strong>Gross Profit</strong></td>
+                    <td class="px-4 py-2" id="grossProfit"></td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="calculateGrossProfit()">Calculate</button></td>
+                </tr>
+                <tr>
+                    <td class="auto-style1" colspan="3"><strong>Other Income</strong></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Discount Received</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="discountReceived" oninput="restrictEdit(this)">500</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="auto-style1"><strong>Total Income</strong></td>
+                    <td class="px-4 py-2" id="totalIncome"></td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="calculateTotalIncome()">Calculate</button></td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 font-bold" colspan="3">Expenses</td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Wages</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="wages" oninput="restrictEdit(this)">4000</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Lighting</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="lighting" oninput="restrictEdit(this)">500</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Rent</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="rent" oninput="restrictEdit(this)">1200</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">General Expenses</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="generalExpenses" oninput="restrictEdit(this)">800</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" class="px-4 py-2 editable">Carriage Outwards</td>
+                    <td contenteditable="true" class="px-4 py-2 editable" id="carriageOutwards" oninput="restrictEdit(this)">1000</td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                </tr>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="auto-style1"><strong>Total Expenses</strong></td>
+                    <td class="px-4 py-2" id="totalExpenses"></td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="calculateTotalExpenses()">Calculate</button></td>
+                </tr>
+                <tr>
+                    <td class="auto-style1"><strong>Net Profit</strong></td>
+                    <td class="px-4 py-2" id="netProfit"></td>
+                    <td class="actions-column"><button class="btn btn-primary btn-sm" onclick="calculateNetProfit()">Calculate</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="flex justify-end">
+            <button class="btn btn-secondary ml-2" onclick="generatePDF()">Download PDF</button>
+        </div>
+    </div>
+
+    <script>
+        let currencySymbol = '$';
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelectorAll('.navbar').forEach(navbar => navbar.classList.toggle('dark-mode'));
+            document.querySelectorAll('.navbar-brand').forEach(brand => brand.classList.toggle('dark-mode'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.footer').forEach(footer => footer.classList.toggle('dark-mode'));
+            document.querySelectorAll('.form-control').forEach(input => input.classList.toggle('dark-mode'));
+            document.querySelectorAll('.table').forEach(table => table.classList.toggle('dark-mode'));
+            document.querySelectorAll('.table th').forEach(th => th.classList.toggle('dark-mode'));
+            document.querySelectorAll('.table td').forEach(td => td.classList.toggle('dark-mode'));
+        }
+
+        function addRow(section) {
+            var table = document.getElementById("profitLossTable").getElementsByTagName('tbody')[0];
+            var row = document.createElement("tr");
+            row.className = section + "-row";
+            var cell1 = document.createElement("td");
+            var cell2 = document.createElement("td");
+            var cell3 = document.createElement("td");
+            cell1.contentEditable = "true";
+            cell1.className = "px-4 py-2 editable";
+            cell2.contentEditable = "true";
+            cell2.className = "px-4 py-2 editable";
+            cell2.oninput = function () { restrictEdit(this); };
+            cell3.innerHTML = '<button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button>';
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            row.appendChild(cell3);
+
+            table.appendChild(row);
+        }
+
+        function updateCurrency() {
+            currencySymbol = document.getElementById('currencySelector').value;
+            document.getElementById('currencySymbol').textContent = currencySymbol;
+            document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+                cell.textContent = cell.textContent.replace(/^[^\d-]+/, currencySymbol);
+            });
+            recalculateAll();
+        }
+
+        function restrictEdit(element) {
+            let value = element.textContent.replace(/[^0-9.-]/g, '');
+            element.textContent = currencySymbol + value;
+        }
+
+        function parseCurrency(value) {
+            value = value.replace(currencySymbol, '').trim();
+            return isNaN(parseFloat(value)) ? 0 : parseFloat(value);
+        }
+
+        function calculateNetSales() {
+            const a = parseCurrency(document.getElementById('sales').textContent);
+            const b = parseCurrency(document.getElementById('salesReturns').textContent);
+            const netSales = a - b;
+            document.getElementById('netSales').textContent = currencySymbol + netSales.toFixed(2);
+        }
+
+        function calculateCostOfSales() {
+            const c = parseCurrency(document.getElementById('openingInventory').textContent);
+            const d = parseCurrency(document.getElementById('purchases').textContent);
+            const e = parseCurrency(document.getElementById('returnOutwards').textContent);
+            const f = parseCurrency(document.getElementById('closingInventory').textContent);
+            const costOfSales = c + d + e - f;
+            document.getElementById('costOfSales').textContent = currencySymbol + costOfSales.toFixed(2);
+        }
+
+        function calculateGrossProfit() {
+            const x = parseCurrency(document.getElementById('netSales').textContent);
+            const y = parseCurrency(document.getElementById('costOfSales').textContent);
+            const grossProfit = x - y;
+            document.getElementById('grossProfit').textContent = currencySymbol + grossProfit.toFixed(2);
+        }
+
+        function calculateTotalIncome() {
+            const g = parseCurrency(document.getElementById('grossProfit').textContent);
+            const h = parseCurrency(document.getElementById('discountReceived').textContent);
+            let otherIncome = 0;
+            document.querySelectorAll('.other-income-row').forEach(row => {
+                otherIncome += parseCurrency(row.cells[1].textContent);
+            });
+            const totalIncome = g + h + otherIncome;
+            document.getElementById('totalIncome').textContent = currencySymbol + totalIncome.toFixed(2);
+        }
+
+        function calculateTotalExpenses() {
+            const i = parseCurrency(document.getElementById('wages').textContent);
+            const j = parseCurrency(document.getElementById('lighting').textContent);
+            const k = parseCurrency(document.getElementById('rent').textContent);
+            const l = parseCurrency(document.getElementById('generalExpenses').textContent);
+            const m = parseCurrency(document.getElementById('carriageOutwards').textContent);
+            let otherExpenses = 0;
+            document.querySelectorAll('.expenses-row').forEach(row => {
+                otherExpenses += parseCurrency(row.cells[1].textContent);
+            });
+            const totalExpenses = i + j + k + l + m + otherExpenses;
+            document.getElementById('totalExpenses').textContent = currencySymbol + totalExpenses.toFixed(2);
+        }
+
+        function calculateNetProfit() {
+            const I = parseCurrency(document.getElementById('totalIncome').textContent);
+            const O = parseCurrency(document.getElementById('totalExpenses').textContent);
+            const netProfit = I - O;
+            document.getElementById('netProfit').textContent = currencySymbol + netProfit.toFixed(2);
+        }
+
+        function saveRow(button) {
+            let row = button.parentElement.parentElement;
+            let cells = row.querySelectorAll('td');
+            let amount = parseCurrency(cells[1].textContent);
+            cells[1].textContent = currencySymbol + amount.toFixed(2);
+        }
+
+        function recalculateAll() {
+            calculateNetSales();
+            calculateCostOfSales();
+            calculateGrossProfit();
+            calculateTotalIncome();
+            calculateTotalExpenses();
+            calculateNetProfit();
+        }
+
+        document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+            cell.addEventListener('input', recalculateAll);
+        });
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const specialTitles = ['Net Sales', 'Cost of Sales', 'Gross Profit', 'Total Income', 'Total Expenses', 'Net Profit'];
+
+            document.querySelectorAll('button').forEach(button => button.classList.add('hidden-pdf'));
+            document.querySelectorAll('.actions-column').forEach(column => column.classList.add('hide-column'));
+
+            const table = document.getElementById("profitLossTable");
+            const rows = table.getElementsByTagName("tr");
+            const rowStyles = Array.from(rows).map(row => {
+                const firstCellText = row.cells[0].innerText.trim();
+                return specialTitles.includes(firstCellText) ? { fontStyle: "bold", textDecoration: "underline" } : {};
+            });
+
+            doc.autoTable({
+                html: '#profitLossTable',
+                didDrawCell: (data) => {
+                    const rowIndex = data.row.index;
+                    if (rowIndex < rowStyles.length) {
+                        const style = rowStyles[rowIndex];
+                        if (style.fontStyle) {
+                            data.cell.styles.fontStyle = style.fontStyle;
+                        }
+                        if (style.textDecoration) {
+                            data.cell.styles.textDecoration = style.textDecoration;
+                        }
+                    }
+                }
+            });
+
+            document.querySelectorAll('button').forEach(button => button.classList.remove('hidden-pdf'));
+            document.querySelectorAll('.actions-column').forEach(column => column.classList.remove('hide-column'));
+
+            doc.save('Profit_and_Loss_Statement.pdf');
+        }
+    </script>
+</body>
+
+</html>

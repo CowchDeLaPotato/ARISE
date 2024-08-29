@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - A.R.I.S.E.</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+	<link href="StSHArise.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">A.R.I.S.E.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="settings.html">Settings <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Settings</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="notificationSettings">Notification Settings</label>
+                                <select class="form-control" id="notificationSettings">
+                                    <option>Email Notifications</option>
+                                    <option>SMS Notifications</option>
+                                    <option>Push Notifications</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="privacySettings">Privacy Settings</label>
+                                <select class="form-control" id="privacySettings">
+                                    <option>Public</option>
+                                    <option>Private</option>
+                                    <option>Friends Only</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Update Settings</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <span>© 2024 A.R.I.S.E. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script src="jquery-3.5.1.slim.min.js"></script>
+    <script src="popper.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelectorAll('.navbar').forEach(navbar => navbar.classList.toggle('dark-mode'));
+            document.querySelectorAll('.navbar-brand').forEach(brand => brand.classList.toggle('dark-mode'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.toggle('dark-mode'));
+            document.querySelectorAll('.hero-section .container').forEach(container => container.classList.toggle('dark-mode'));
+            document.querySelectorAll('.feature-card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card-title').forEach(title => title.classList.toggle('dark-mode'));
+            document.querySelectorAll('.btn-primary').forEach(btn => btn.classList.toggle('dark-mode'));
+            document.querySelectorAll('.btn-outline-primary').forEach(btn => btn.classList.toggle('dark-mode'));
+            document.querySelectorAll('.footer').forEach(footer => footer.classList.toggle('dark-mode'));
+            document.querySelectorAll('.form-control').forEach(input => input.classList.toggle('dark-mode'));
+        }
+    </script>
+</body>
+</html>

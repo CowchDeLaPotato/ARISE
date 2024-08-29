@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting - A.R.I.S.E.</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link href="StSHArise.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="index.html">A.R.I.S.E.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html">Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Budgeting</h2>
+        <p class="lead text-center">View and manage your budget with variance analysis.</p>
+        <!-- Currency Selection -->
+        <div class="text-center mb-4">
+            <label for="currencySelector">Select Currency: </label>
+            <select id="currencySelector" onchange="updateCurrency()">
+                <option value="$">$ - Dollar</option>
+                <option value="₹">₹ - Rupee</option>
+                <option value="A$">A$ - Australian Dollar</option>
+                <option value="€">€ - Euro</option>
+                <option value="£">£ - Pound</option>
+            </select>
+        </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Variance Analysis</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Budgeted Amount</th>
+                            <th>Actual Amount</th>
+                            <th>Variance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budgetTable">
+                        <tr>
+                            <td contenteditable="true">Item 1</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$1000</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$900</td>
+                            <td>$100</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">Item 2</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$2000</td>
+                            <td contenteditable="true" oninput="restrictEdit(this)">$2100</td>
+                            <td>-$100</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+                        </tr>
+                        <!-- Add more items as needed -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td id="totalBudgetedAmount">$0.00</td>
+                            <td id="totalActualAmount">$0.00</td>
+                            <td id="totalVariance">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <button class="btn btn-success" onclick="addRow()">+ Add Row</button>
+                <button class="btn btn-primary" onclick="calculateFinalVariance()">Calculate Final Variance</button>
+                <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <span>© 2024 A.R.I.S.E. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script>
+        let currencySymbol = '$';
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelectorAll('.navbar').forEach(navbar => navbar.classList.toggle('dark-mode'));
+            document.querySelectorAll('.navbar-brand').forEach(brand => brand.classList.toggle('dark-mode'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.toggle('dark-mode'));
+            document.querySelectorAll('.card').forEach(card => card.classList.toggle('dark-mode'));
+            document.querySelectorAll('.footer').forEach(footer => footer.classList.toggle('dark-mode'));
+            document.querySelectorAll('.form-control').forEach(input => input.classList.toggle('dark-mode'));
+        }
+
+        function restrictEdit(element) {
+            let value = element.textContent.replace(/[^0-9.]/g, '');
+            element.textContent = currencySymbol + value;
+        }
+
+        function updateCurrency() {
+            currencySymbol = document.getElementById('currencySelector').value;
+            document.querySelectorAll('#budgetTable td:nth-child(2), #budgetTable td:nth-child(3), #totalBudgetedAmount, #totalActualAmount, #totalVariance').forEach(cell => {
+                cell.textContent = cell.textContent.replace(/^[^\d]+/, currencySymbol);
+            });
+        }
+
+        function saveRow(button) {
+            let row = button.parentElement.parentElement;
+            let cells = row.querySelectorAll('td');
+            let budgetedAmount = parseFloat(cells[1].textContent.replace(currencySymbol, ''));
+            let actualAmount = parseFloat(cells[2].textContent.replace(currencySymbol, ''));
+            let variance = budgetedAmount - actualAmount;
+            cells[3].textContent = currencySymbol + (variance >= 0 ? variance.toFixed(2) : `-${Math.abs(variance).toFixed(2)}`);
+        }
+
+        function addRow() {
+            let table = document.getElementById('budgetTable');
+            let row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td contenteditable="true">New Item</td>
+                <td contenteditable="true" oninput="restrictEdit(this)">${currencySymbol}0.00</td>
+                <td contenteditable="true" oninput="restrictEdit(this)">${currencySymbol}0.00</td>
+                <td>${currencySymbol}0.00</td>
+                <td><button class="btn btn-primary btn-sm" onclick="saveRow(this)">Save</button></td>
+            `;
+
+            table.appendChild(row);
+        }
+
+        function calculateFinalVariance() {
+            let table = document.getElementById('budgetTable');
+            let rows = table.querySelectorAll('tr');
+            let totalBudgetedAmount = 0;
+            let totalActualAmount = 0;
+
+            rows.forEach(row => {
+                let cells = row.querySelectorAll('td');
+                totalBudgetedAmount += parseFloat(cells[1].textContent.replace(currencySymbol, ''));
+                totalActualAmount += parseFloat(cells[2].textContent.replace(currencySymbol, ''));
+            });
+
+            let totalVariance = totalBudgetedAmount - totalActualAmount;
+
+            document.getElementById('totalBudgetedAmount').textContent = `${currencySymbol}${totalBudgetedAmount.toFixed(2)}`;
+            document.getElementById('totalActualAmount').textContent = `${currencySymbol}${totalActualAmount.toFixed(2)}`;
+            document.getElementById('totalVariance').textContent = totalVariance >= 0 ? `${currencySymbol}${totalVariance.toFixed(2)}` : `-${currencySymbol}${Math.abs(totalVariance).toFixed(2)}`;
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text('Budget Variance Analysis', 14, 16);
+
+            const table = document.getElementById('budgetTable');
+            const rows = Array.from(table.querySelectorAll('tr')).map(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                return cells.slice(0, -1).map(cell => cell.textContent);
+            });
+
+            rows.push([
+                'Total', document.getElementById('totalBudgetedAmount').textContent, document.getElementById('totalActualAmount').textContent, document.getElementById('totalVariance').textContent
+            ]);
+
+            doc.autoTable({
+                head: [['Item', 'Budgeted Amount', 'Actual Amount', 'Variance']],
+                body: rows,
+                startY: 20
+            });
+
+            doc.save('Budget_Variance_Analysis.pdf');
+        }
+    </script>
+</body>
+</html>
